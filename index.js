@@ -1,6 +1,6 @@
 const { ApolloServer, gql } = require("apollo-server");
 
-const typeDefs = gql`
+let typeDefs = gql`
     type Blog {
         id: ID!
         author: String!
@@ -8,6 +8,7 @@ const typeDefs = gql`
         body: String!
         likesCount: Int
         comments: [String]
+        reply: [String]
     }
 
     type Query {
@@ -22,15 +23,15 @@ const typeDefs = gql`
 
         deleteBlog(id: ID!): Boolean
 
-        #likeBlog(id: ID!, likesCount): Blog
+        likeBlog(id: ID!): Blog
 
-        #unlikeBlog(id: ID!, likesCount): Blog
+        unlikeBlog(id: ID!): Blog
 
         commentBlog(id: String!, comments:String!): Blog
 
         deleteComment(id: ID!, comments:String!): Blog
 
-        #replyComment(id: ID!): Blog
+        reply(id: ID!, reply: String!): Blog
     }
     #typeSubscription
 `;
@@ -62,14 +63,27 @@ const resolvers = {
             const { id } = args;
             const Bool = Boolean(blogs[id]);
             delete blogs[id];
+            return { Bool };
+        },
 
-        return { Bool };
+        likeBlog: (parent, args) => {
+            const { id, likesCount } = args;
+            const add = blogs[likesCount]
+                add++
+        return blogs
+        },
+
+        unlikeBlog: (parent, args) => {
+            const { id, likesCount } = args;
+            const blog = { id, likesCount };
+            blogs[likesCount] = -1
+            return blogs;
         },
 
         commentBlog: (parent, args) => {
-            const {id, comments } = args;
-            const comment = { comments };
-            comments.push(comment)
+            const { comments } = args;
+            const com = { comments };
+            blogs[comments]= com;
             return blogs;
             },
 
@@ -79,24 +93,15 @@ const resolvers = {
             comments.unshift(comment[id])
             return blogs;
             },
+        
+        reply: (parent, args) => {
+            const { id, reply} = args;
+            const rep = { reply };
+            blogs[reply]= rep;
+            return blogs;
+        }
         }
     }
-
-    
-        // likeBlog: (parent, args) => {
-        //     const { id, likesCount } = args;
-        //     const blog = { likesCount };
-        //     blog+1
-        //     return blog;
-        // },
-
-        // unlikeBlog: (parent, args) => {
-        //     const { id, likesCount } = args;
-        //     const blog = { likesCount };
-        //     blog+1
-        //     return blog;
-        // },
-
 
 const blogs = [
     {
@@ -126,22 +131,3 @@ server.listen(8000).then(({ url }) => {
     console.log(`🚀  Server ready at ${ url }`);
 }).catch(err => console.log(err.message));
 
-
-
-//         commentBlog: (parent, args) => {
-//             const { id , comAuthor, body } = args;
-//             const blog = blog.findById(blog);
-//             blog.save();
-//             return blog;
-//         },
-        
-        // updateBlog: (parent, args) => {
-        //     const { id, author, title, body } = args;
-        //     const blog = { id, author, title, body };
-            
-        //     return blog;
-        // },
-        // deleteBlog: (parent, args) => {
-        //     return blogs.findByIdAndDelete(args.id);
-        // },
-        
