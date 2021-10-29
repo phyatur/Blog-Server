@@ -8,7 +8,7 @@ let typeDefs = gql`
         body: String!
         likesCount: Int
         comments: [String]
-        reply: String
+        reply: [String]
     }
 
     type Query {
