@@ -7,21 +7,7 @@ const typeDefs = gql`
         title: String!
         body: String!
         likesCount: Int
-        comments: [Comment]
-    }
-
-
-    type Comment {
-        id: ID!
-        commentsAuthor: String!
-        body: String!
-        replies: [Reply]
-    }
-
-    type Reply {
-        id: ID!
-        replyAuthor: String!
-        body: String!
+        comments: [String]
     }
 
     type Query {
@@ -36,10 +22,14 @@ const typeDefs = gql`
 
         deleteBlog(id: ID!): Boolean
 
-        likeBlog(id: ID!): Blog
+        #likeBlog(id: ID!, likesCount): Blog
 
-        #commentBlog(BlogId: String!, body:String!): Blog!
-        #deleteComment(BlogId: ID!, CommentId: ID!): Blog!
+        #unlikeBlog(id: ID!, likesCount): Blog
+
+        commentBlog(id: String!, comments:String!): Blog
+
+        deleteComment(id: ID!, comments:String!): Blog
+
         #replyComment(id: ID!): Blog
     }
     #typeSubscription
@@ -75,13 +65,38 @@ const resolvers = {
 
         return { Bool };
         },
-        likeBlog: (parent, args) => {
-            const { id } = args;
-            blogs.likesCount++ ;
-        }
-        }
 
-    } 
+        commentBlog: (parent, args) => {
+            const {id, comments } = args;
+            const comment = { comments };
+            comments.push(comment)
+            return blogs;
+            },
+
+        deleteComment: (parent, args) => {
+            const {id, comments } = args;
+            const comment = { id };
+            comments.unshift(comment[id])
+            return blogs;
+            },
+        }
+    }
+
+    
+        // likeBlog: (parent, args) => {
+        //     const { id, likesCount } = args;
+        //     const blog = { likesCount };
+        //     blog+1
+        //     return blog;
+        // },
+
+        // unlikeBlog: (parent, args) => {
+        //     const { id, likesCount } = args;
+        //     const blog = { likesCount };
+        //     blog+1
+        //     return blog;
+        // },
+
 
 const blogs = [
     {
